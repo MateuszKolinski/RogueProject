@@ -493,6 +493,10 @@ def read_database(db_path):
 
 def main():
     default_path = os.path.dirname(os.path.abspath(__file__))
+
+    if os.path.exists(os.path.join(default_path, "Templates")) is False:
+        os.mkdir(os.path.join(default_path, "Templates"))
+
     card_template = "WhiteTemplate.png"
     border_template = "InnerBorderTemplate.png"
     sparks_template = "Web.png"
@@ -506,4 +510,6 @@ def main():
     for card in cards:
         create_card(card_template_path, border_template_path, os.path.join(default_path, "Cards Final", card.creature_path), sparks_template_path, str(card.attack), str(card.mana), str(card.health), str(card.cost), str(card.ability_text), str(card.name), card.get_allegiences())
 
-main()
+
+if __name__ == "__main__":
+    main()
