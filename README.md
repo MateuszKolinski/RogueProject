@@ -3,3 +3,7 @@
 
 ### Still in progress
 ### Currently finishing card generation
+
+# White template card is the basis for any card generation.
+
+![WhiteTemplate](Templates/WhiteTemplate.png)
