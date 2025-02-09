@@ -6,4 +6,4 @@
 
 # White template card is the basis for any card generation.
 
-<img src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/WhiteTemplate.png" width="100" height="140">
+<img src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/WhiteTemplate.png" width="200" height="280">
