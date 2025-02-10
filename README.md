@@ -12,7 +12,7 @@ To generate a card, we need:
 - a database entry specifying said character's name, stats and colors
 
 | | | |
-|:-------------------------:|:-------------------------:|:-------------------------:|
+|:-----------------------:|:-------------------------:|:-------------------------:|
 | <img width="200" height="280" alt="White Template" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/WhiteTemplate.png"> White Card Template |  <img width="200" height="280" alt="Sparks image" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/Web.png"> Border Fractals | <img width="200" height="280" alt="Border Template" src="https://github.com/MateuszKolinski/RogueProject/blob/main/Templates/InnerBorderTemplate.png?raw=true"> Border Template |
 
 First step after loading the above images is to determine the colors of the card. Any card can currently have one, two or three colors. 
