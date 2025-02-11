@@ -87,33 +87,33 @@ class Card:
 
     def get_allegiences(self):
         allegiences = []
-        if self.vampire == 1:
+        if self.vampire == 1 or self.vampire == "1":
             allegiences.append("Vampire")
-        if self.dragon == 1:
+        if self.dragon == 1 or self.dragon == "1":
             allegiences.append("Dragon")
-        if self.human == 1:
+        if self.human == 1 or self.human == "1":
             allegiences.append("Human")
-        if self.horror == 1:
+        if self.horror == 1 or self.horror == "1":
             allegiences.append("Horror")
-        if self.demon == 1:
+        if self.demon == 1 or self.demon == "1":
             allegiences.append("Demon")
-        if self.undead == 1:
+        if self.undead == 1 or self.undead == "1":
             allegiences.append("Undead")
-        if self.construct == 1:
+        if self.construct == 1 or self.construct == "1":
             allegiences.append("Construct")
-        if self.angel == 1:
+        if self.angel == 1 or self.angel == "1":
             allegiences.append("Angel")
-        if self.warrior == 1:
+        if self.warrior == 1 or self.warrior == "1":
             allegiences.append("Warrior")
-        if self.mage == 1:
+        if self.mage == 1 or self.mage == "1":
             allegiences.append("Mage")
-        if self.beast == 1:
+        if self.beast == 1 or self.beast == "1":
             allegiences.append("Beast")
-        if self.knight == 1:
+        if self.knight == 1 or self.knight == "1":
             allegiences.append("Knight")
-        if self.hunter == 1:
+        if self.hunter == 1 or self.hunter == "1":
             allegiences.append("Hunter")
-        if self.noble == 1:
+        if self.noble == 1 or self.noble == "1":
             allegiences.append("Noble")
 
         return allegiences
