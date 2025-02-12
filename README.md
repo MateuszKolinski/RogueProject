@@ -37,9 +37,16 @@ To generate a card with three colors, the card space is divided into two trapeze
 
 After generating a colored card template, a fanciful fractal image is weight-blended onto it.
 
-Next step is to add card borders from the Border Template.
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparky.png>
 
-Character image is added next. 
+Next step is to add card borders from the Border Template onto character image.
+
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/creature_n_border.png>
+
+Then we merge colored card template with character and border template.
+
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/creature_n_border_n_colour.jpg>
 
 Finally, any text describing character's name and stats is added on top of the card.
 
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/hi.png>
