@@ -442,9 +442,6 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 0.8, sparks_image.copy(), 0.2, 0.0)
 
-    card_colour_image_border = card_colour_image.copy()
-    card_colour_image_border[np.where(border_template.copy()[:, :, 3] != 0)] = border_template[np.where(border_template.copy()[:, :, 3] != 0)]
-
     attack_number_image = create_text_image(attack, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
     mana_number_image = create_text_image(mana, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
     health_number_image = create_text_image(health, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
@@ -453,10 +450,11 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     ability_text_image = create_text_image(ability_text, 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, TEXT_WIDTH_END - TEXT_WIDTH_START)
     name_text_image = create_text_image(name_text, 0.7 * SCALING_FACTOR, 3, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
     allegience_text_image = create_text_image(" ".join(allegiences), 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
-
+    creature_image[:, :, 3] = 255
     creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
     creature_n_border = add_two_images(creature_image, border_template, (0, 0))
+    
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
 
     image3 = add_two_images(creature_n_border_n_colour, attack_number_image, (ATTACK_NUMBER_WIDTH, ATTACK_NUMBER_HEIGHT))
