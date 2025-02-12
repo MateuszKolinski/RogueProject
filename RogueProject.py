@@ -295,7 +295,7 @@ def create_angled_gradients(card_colour_image, card_image, rotation_sign, x_plac
     return card_colour_image
 
 
-def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, attack, mana, health, cost, ability_text, name_text, allegiences):
+def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, attack, mana, health, cost, ability_text, name_text, allegiences, output_path):
     if attack == "None":
         attack = "1"
     if health == "None":
@@ -467,11 +467,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     image9[:, :, 3] = 255
 
-    cv.imshow("Hi2", image9)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-
-    cv.imwrite("hi.png", image9)
+    cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image9)
 
 
 def read_database(db_path):
@@ -492,12 +488,20 @@ def read_database(db_path):
 def main():
     default_path = os.path.dirname(os.path.abspath(__file__))
 
-    if os.path.exists(os.path.join(default_path, "Templates")) is False:
-        os.mkdir(os.path.join(default_path, "Templates"))
-
     card_template = "WhiteTemplate.png"
     border_template = "InnerBorderTemplate.png"
     sparks_template = "Web.png"
+    characters_directory = "Characters"
+    output_directory = "Output"
+
+    if os.path.exists(os.path.join(default_path, "Templates")) is False:
+        os.mkdir(os.path.join(default_path, "Templates"))
+
+    if os.path.exists(os.path.join(default_path, characters_directory)) is False:
+        os.mkdir(os.path.join(default_path, characters_directory))
+
+    if os.path.exists(os.path.join(default_path, output_directory)) is False:
+        os.mkdir(os.path.join(default_path, output_directory))
 
     card_template_path = os.path.join(default_path, "Templates", card_template)
     border_template_path = os.path.join(default_path, "Templates", border_template)
@@ -506,7 +510,7 @@ def main():
     cards = read_database(os.path.join(os.path.dirname(os.path.abspath(__file__)), "RogueProjectDB.db"))
     
     for card in cards:
-        create_card(card_template_path, border_template_path, os.path.join(default_path, "Cards Final", card.creature_path), sparks_template_path, str(card.attack), str(card.mana), str(card.health), str(card.cost), str(card.ability_text), str(card.name), card.get_allegiences())
+        create_card(card_template_path, border_template_path, os.path.join(default_path, characters_directory, card.creature_path), sparks_template_path, str(card.attack), str(card.mana), str(card.health), str(card.cost), str(card.ability_text), str(card.name), card.get_allegiences(), os.path.join(default_path, output_directory))
 
 
 if __name__ == "__main__":
