@@ -134,6 +134,8 @@ class Card:
 
 # Adds two images, one on top of another with an option of displacing the top one
 def add_two_images(bottom, top, displacement):
+    # Limiting dimensions so that the output image doesn't have to be enlarged
+    # Also figuring out new image's dimensions
     if displacement[0] + top.shape[1] > bottom.shape[1]:
         temp_width = displacement[0] + top.shape[1]
         right_border = temp_width - bottom.shape[1]
@@ -148,8 +150,10 @@ def add_two_images(bottom, top, displacement):
         temp_height = bottom.shape[0]
         bottom_border = 0
 
+    # Creating a new image
     output_image = np.zeros((temp_height, temp_width, 4), np.uint8)
 
+    # Enlarging bottom image with makeborder
     if temp_height != bottom.shape[0] or temp_width != bottom.shape[1]:
         output_image = cv.copyMakeBorder(bottom, 0, bottom_border, 0, right_border, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
     else:
