@@ -1,3 +1,10 @@
+# Unnamed Rogue-like Card Game Project
+# By Mateusz Kolinski MateuszPKolinski@gmail.com
+# The code below generates an image of a playing card according to provided data in database
+# Image is generated from a few border templates and the character image associated with the database data
+# Each card can be painted in one, two or three colors depending on the data in database
+# As such, it is easier to use this code to swiftly generate hundreds of playing cards instead of doing it with a Photoshop or GIMP 
+
 import cv2 as cv
 import numpy as np
 import sqlite3
@@ -5,10 +12,13 @@ import os
 import scipy
 import math
 
+# Scales all objects in the card image
 SCALING_FACTOR = 2
 
+# Constant card and object dimension settings
 CARD_WIDTH = 500 * SCALING_FACTOR
 CARD_HEIGHT = 700 * SCALING_FACTOR
+
 COLOUR_THRESHOLD = (0.001, 0.001, 0.001)
 
 NUMBER_WIDTH = 100 * SCALING_FACTOR
@@ -45,6 +55,7 @@ TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
 
 LINE_SPACE_HEIGHT = 1
 
+# Constant card colors assigned to database input
 COLOUR_DICT = {"Vampire": (1, 1, 1, 0.2),
                 "Dragon": (0, 0, 250, 0.1),
                 "Human": (203, 192, 255, 0.1),
@@ -60,6 +71,7 @@ COLOUR_DICT = {"Vampire": (1, 1, 1, 0.2),
                 "Hunter": (0, 200, 0, 0.3),
                 "Noble": (0, 215, 255, 0.1)
                 }
+
 
 class Card:
     def __init__(self, name, ability_text, mana, attack, health, cost, creature_path, vampire=0, dragon=0, human=0, horror=0, demon=0, undead=0, construct=0, angel=0, warrior=0, mage=0, beast=0, knight=0, hunter=0, noble=0):
@@ -85,6 +97,7 @@ class Card:
         self.hunter = hunter
         self.noble = noble
 
+    # Allegiences define card colors
     def get_allegiences(self):
         allegiences = []
         if self.vampire == 1 or self.vampire == "1":
@@ -119,6 +132,7 @@ class Card:
         return allegiences
     
 
+# Adds two images, one on top of another with an option of displacing the top one
 def add_two_images(bottom, top, displacement):
     if displacement[0] + top.shape[1] > bottom.shape[1]:
         temp_width = displacement[0] + top.shape[1]
@@ -154,6 +168,7 @@ def add_two_images(bottom, top, displacement):
     return output_image
 
 
+# Creates an image containing desired text
 def create_text_image(text, size, thickness, colour, font, width):
     lines = wrap_text(text, size, thickness, font, width)
     line_images = []
@@ -174,6 +189,7 @@ def create_text_image(text, size, thickness, colour, font, width):
     return temp
 
 
+# A function cropping a text image to its size, since cv.puttext doesn't do that automatically
 def putText_MK(text, scale, thickness, font, colour):
     base = np.zeros((2000, 2000, 3), np.uint8)
     text_img = cv.putText(base, text, (1000, 1000), font, scale, colour, thickness, cv.FILLED)
@@ -196,6 +212,7 @@ def putText_MK(text, scale, thickness, font, colour):
     return crop
 
 
+# Wrapping image text lines
 def wrap_text(text, scale, thickness, font, width):
     textSize = cv.getTextSize(text, font, scale, thickness)
     spaceSize = cv.getTextSize(" ", font, scale, thickness)
@@ -229,6 +246,7 @@ def wrap_text(text, scale, thickness, font, width):
     return text_list
 
 
+# Cropping an image to content, used for morphological operations on angled gradients in tricolor card images
 def crop_to_content(image):
     image_data = np.asarray(image)
     image_data_bw = image_data.max(axis=2)
@@ -295,7 +313,9 @@ def create_angled_gradients(card_colour_image, card_image, rotation_sign, x_plac
     return card_colour_image
 
 
+# Main card generation function
 def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, attack, mana, health, cost, ability_text, name_text, allegiences, output_path):
+    # Essentially sanitizing database output
     if attack == "None":
         attack = "1"
     if health == "None":
@@ -309,6 +329,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     if name_text == "None":
         name_text = "MK"
 
+    # Loading template images
     card_image = cv.imread(card_template_path, cv.IMREAD_UNCHANGED)
     card_image = cv.resize(card_image, (CARD_WIDTH, CARD_HEIGHT), interpolation = cv.INTER_AREA)
 
@@ -323,6 +344,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     creature_image = cv.imread(creature_image_path, cv.IMREAD_UNCHANGED)
     creature_image = cv.resize(creature_image, (CREATURE_WIDTH, CREATURE_HEIGHT), interpolation = cv.INTER_AREA)
 
+    # Adding alpha channel if it's not present yet
     if creature_image.shape[2] != 4:
         # First create the image with alpha channel
         creature_image = cv.cvtColor(creature_image, cv.COLOR_RGB2RGBA)
@@ -330,13 +352,18 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         # Then assign the mask to the last channel of the image
         creature_image[:, :, 3] = np.ones((creature_image.shape[0], creature_image.shape[1]), np.uint8)
 
+    # One allegience which means one color card
     if len(allegiences) == 1:
+        # Change color of any non-black pixel to a color associated with card's allegience
         colour_image[np.any(card_image.copy()[:, :, :3] != [0, 0, 0], axis=2)] = (COLOUR_DICT[allegiences[0]][0], COLOUR_DICT[allegiences[0]][1], COLOUR_DICT[allegiences[0]][2], 255)
 
+        # White-blend an image over it to 'mellow' the color down a little
         alpha = COLOUR_DICT[allegiences[0]][3]
         card_colour_image = cv.addWeighted(card_image.copy(), alpha, colour_image.copy(), 1-alpha, 0.0)
     else:
+        # Two allegiences which means two color card
         if len(allegiences) == 2:
+            # Divide the card vertically into two, then apply color associated with card's allegience
             left_image = card_image.copy()[:, :CARD_WIDTH//2, :]
             left_image[np.any(left_image.copy()[:, :, :3] != [0, 0, 0], axis=2)] = (COLOUR_DICT[allegiences[0]][0], COLOUR_DICT[allegiences[0]][1], COLOUR_DICT[allegiences[0]][2], 255)
 
