@@ -49,4 +49,4 @@ Then we merge colored card template with character and border template.
 
 Finally, any text describing character's name and stats is added on top of the card.
 
-<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/hi.png>
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/final.png>
