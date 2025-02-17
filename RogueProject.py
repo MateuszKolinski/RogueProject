@@ -515,7 +515,11 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
     creature_n_border = add_two_images(creature_image, border_template, (0, 0))
+
+    cv.imwrite("creature_n_border.png", creature_n_border)
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
+    creature_n_border_n_colour[:, :, 3] = 255
+    cv.imwrite("creature_n_border_n_colour.png", creature_n_border_n_colour)
 
     image3 = add_two_images(creature_n_border_n_colour, attack_number_image, (ATTACK_NUMBER_WIDTH, ATTACK_NUMBER_HEIGHT))
     image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_WIDTH - int(mana_number_image.shape[1]), MANA_NUMBER_HEIGHT))
