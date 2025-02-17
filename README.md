@@ -45,7 +45,7 @@ Next step is to add card borders from the Border Template onto character image.
 
 Then we merge colored card template with character and border template.
 
-<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/creature_n_border_n_colour.jpg>
+<img width="200" height="280" alt="One color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/creature_n_border_n_colour.png>
 
 Finally, any text describing character's name and stats is added on top of the card.
 
