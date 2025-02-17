@@ -263,6 +263,33 @@ def crop_to_content(image):
     return image_data_new
 
 
+def round_corners(image, r):
+    h, w = image.shape[:2]
+    t = 1
+    c = (255, 255, 255)
+    mask = np.zeros((h, w), dtype=np.uint8) * 255
+
+    # Draw four quarter-circles in corners
+    mask = cv.ellipse(mask, (int(r+t/2), int(r+t/2)), (r, r), 180, 0, 90, c, t)
+    mask = cv.ellipse(mask, (int(w-r-t/2-1), int(r+t/2)), (r, r), 270, 0, 90, c, t)
+    mask = cv.ellipse(mask, (int(r+t/2), int(h-r-t/2-1)), (r, r), 90, 0, 90, c, t)
+    mask = cv.ellipse(mask, (int(w-r-t/2-1), int(h-r-t/2-1)), (r, r), 0, 0, 90, c, t)
+
+    # Draw borders between quarter-circles
+    mask = cv.line(mask, (int(r+t/2), int(t/2)), (int(w-r+t/2-1), int(t/2)), c, t)
+    mask = cv.line(mask, (int(t/2), int(r+t/2)), (int(t/2), int(h-r+t/2)), c, t)
+    mask = cv.line(mask, (int(r+t/2), int(h-t/2)), (int(w-r+t/2-1), int(h-t/2)), c, t)
+    mask = cv.line(mask, (int(w-t/2), int(r+t/2)), (int(w-t/2), int(h-r+t/2)), c, t)
+
+    # Fill the mask
+    cv.floodFill(mask, None, (w//2, h//2), c)
+
+    # Apply to mask
+    image = cv.bitwise_and(image, image, mask=mask)
+
+    return image
+
+
 def create_angled_gradients(card_colour_image, card_image, rotation_sign, x_placement, second_color_width):
     # Get gradient starting colors from our image
     gradient_start_colour = card_colour_image[1, second_color_width, :4]
@@ -355,6 +382,9 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
         # Then assign the mask to the last channel of the image
         creature_image[:, :, 3] = np.ones((creature_image.shape[0], creature_image.shape[1]), np.uint8)
+
+    creature_image[:, :, 3] = 255
+    creature_image = round_corners(creature_image, 30)
 
     # One allegience which means one color card
     if len(allegiences) == 1:
@@ -481,11 +511,10 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     ability_text_image = create_text_image(ability_text, 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, TEXT_WIDTH_END - TEXT_WIDTH_START)
     name_text_image = create_text_image(name_text, 0.7 * SCALING_FACTOR, 3, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
     allegience_text_image = create_text_image(" ".join(allegiences), 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
-    creature_image[:, :, 3] = 255
+
     creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
     creature_n_border = add_two_images(creature_image, border_template, (0, 0))
-    
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
 
     image3 = add_two_images(creature_n_border_n_colour, attack_number_image, (ATTACK_NUMBER_WIDTH, ATTACK_NUMBER_HEIGHT))
