@@ -531,8 +531,23 @@ def main():
     cards = read_database(os.path.join(os.path.dirname(os.path.abspath(__file__)), "RogueProjectDB.db"))
     
     for card in cards:
-        create_card(card_template_path, border_template_path, os.path.join(default_path, characters_directory, card.creature_path), sparks_template_path, str(card.attack), str(card.mana), str(card.health), str(card.cost), str(card.ability_text), str(card.name), card.get_allegiences(), os.path.join(default_path, output_directory))
-
+        try:
+            create_card(card_template_path,
+                        border_template_path,
+                        os.path.join(default_path, characters_directory, card.creature_path),
+                        sparks_template_path,
+                        str(card.attack),
+                        str(card.mana),
+                        str(card.health),
+                        str(card.cost),
+                        str(card.ability_text),
+                        str(card.name),
+                        card.get_allegiences(),
+                        os.path.join(default_path, output_directory)
+                        )
+            
+        except Exception as e:
+            print(f"Error processing card '{card.name}': {e}")
 
 if __name__ == "__main__":
     main()
