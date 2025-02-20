@@ -3,7 +3,7 @@
 # The code below generates an image of a playing card according to provided data in database
 # Image is generated from a few border templates and the character image associated with the database data
 # Each card can be painted in one, two or three colors depending on the data in database
-# As such, it is easier to use this code to swiftly generate hundreds of playing cards instead of doing it with a Photoshop or GIMP 
+# It is simply easier to use this code to swiftly generate hundreds of cards instead of doing it with a manually one by one
 
 import cv2 as cv
 import numpy as np
@@ -74,7 +74,7 @@ COLOUR_DICT = {"Vampire": (1, 1, 1, 0.2),
 
 
 class Card:
-    def __init__(self, name, ability_text, mana, attack, health, cost, creature_path, vampire=0, dragon=0, human=0, horror=0, demon=0, undead=0, construct=0, angel=0, warrior=0, mage=0, beast=0, knight=0, hunter=0, noble=0):
+    def __init__(self, name, ability_text, mana, attack, health, cost, creature_path, **allegiances):
         self.name = name
         self.ability_text = ability_text
         self.mana = mana
@@ -82,53 +82,14 @@ class Card:
         self.health = health
         self.cost = cost
         self.creature_path = creature_path
-        self.vampire = vampire
-        self.dragon = dragon
-        self.human = human
-        self.horror = horror
-        self.demon = demon
-        self.undead = undead
-        self.construct = construct
-        self.angel = angel
-        self.warrior = warrior
-        self.mage = mage
-        self.beast = beast
-        self.knight = knight
-        self.hunter = hunter
-        self.noble = noble
+
+        # Dynamically assign allegiance attributes using the allegiances dictionary
+        for key in allegiances:
+            setattr(self, key.lower(), allegiances.get(key.lower(), 0))
 
     # Allegiences define card colors
     def get_allegiences(self):
-        allegiences = []
-        if self.vampire == 1 or self.vampire == "1":
-            allegiences.append("Vampire")
-        if self.dragon == 1 or self.dragon == "1":
-            allegiences.append("Dragon")
-        if self.human == 1 or self.human == "1":
-            allegiences.append("Human")
-        if self.horror == 1 or self.horror == "1":
-            allegiences.append("Horror")
-        if self.demon == 1 or self.demon == "1":
-            allegiences.append("Demon")
-        if self.undead == 1 or self.undead == "1":
-            allegiences.append("Undead")
-        if self.construct == 1 or self.construct == "1":
-            allegiences.append("Construct")
-        if self.angel == 1 or self.angel == "1":
-            allegiences.append("Angel")
-        if self.warrior == 1 or self.warrior == "1":
-            allegiences.append("Warrior")
-        if self.mage == 1 or self.mage == "1":
-            allegiences.append("Mage")
-        if self.beast == 1 or self.beast == "1":
-            allegiences.append("Beast")
-        if self.knight == 1 or self.knight == "1":
-            allegiences.append("Knight")
-        if self.hunter == 1 or self.hunter == "1":
-            allegiences.append("Hunter")
-        if self.noble == 1 or self.noble == "1":
-            allegiences.append("Noble")
-
+        allegiences = [key for key, _ in COLOUR_DICT.items() if getattr(self, key.lower(), 0) in (1, "1")]
         return allegiences
     
 
@@ -540,7 +501,7 @@ def read_database(db_path):
     record_list = [a for a in cursor.execute("SELECT * FROM CARDS")]
     cards = []
     for record in record_list:
-        cards.append(Card(record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9], record[10], record[11], record[12], record[13], record[14], record[15], record[16], record[17], record[18], record[19], record[20], record[21]))
+        cards.append(Card(record[1], record[2], record[3], record[4], record[5], record[6], record[7], vampire=record[8], dragon=record[9], human=record[10], horror=record[11], demon=record[12], undead=record[13], construct=record[14], angel=record[15], warrior=record[16], mage=record[17], beast=record[18], knight=record[19], hunter=record[20], noble=record[21]))
 
     connection.close()
 
