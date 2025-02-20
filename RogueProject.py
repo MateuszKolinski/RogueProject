@@ -88,8 +88,10 @@ class Card:
             setattr(self, key.lower(), allegiances.get(key.lower(), 0))
 
     # Allegiences define card colors
+    # Using COLOUR_DICT since it has all the allegiences names already
     def get_allegiences(self):
         allegiences = [key for key, _ in COLOUR_DICT.items() if getattr(self, key.lower(), 0) in (1, "1")]
+
         return allegiences
     
 
@@ -224,11 +226,12 @@ def crop_to_content(image):
     return image_data_new
 
 
+# Rounding corners of an image, used to round character image only
 def round_corners(image, r):
     h, w = image.shape[:2]
     t = 1
     c = (255, 255, 255)
-    mask = np.zeros((h, w), dtype=np.uint8) * 255
+    mask = np.zeros((h, w), dtype=np.uint8)
 
     # Draw four quarter-circles in corners
     mask = cv.ellipse(mask, (int(r+t/2), int(r+t/2)), (r, r), 180, 0, 90, c, t)
@@ -517,14 +520,9 @@ def main():
     characters_directory = "Characters"
     output_directory = "Output"
 
-    if os.path.exists(os.path.join(default_path, "Templates")) is False:
-        os.mkdir(os.path.join(default_path, "Templates"))
-
-    if os.path.exists(os.path.join(default_path, characters_directory)) is False:
-        os.mkdir(os.path.join(default_path, characters_directory))
-
-    if os.path.exists(os.path.join(default_path, output_directory)) is False:
-        os.mkdir(os.path.join(default_path, output_directory))
+    os.makedirs(os.path.join(default_path, "Templates"), exist_ok=True)
+    os.makedirs(os.path.join(default_path, characters_directory), exist_ok=True)
+    os.makedirs(os.path.join(default_path, output_directory), exist_ok=True)
 
     card_template_path = os.path.join(default_path, "Templates", card_template)
     border_template_path = os.path.join(default_path, "Templates", border_template)
