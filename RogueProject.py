@@ -499,19 +499,56 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     for i in range(len(allegiences)):
         logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
         logo = cv.imread(logo_template, cv.IMREAD_UNCHANGED)
+        logo = replace_color(logo, [8, 255, 0], [0, 0, 0], 40)
+        logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
         logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
         image9 = add_two_images(image9, logo, (int(CARD_WIDTH // 2 - len(allegiences) * LOGO_WIDTH//2 + i * LOGO_WIDTH), LOGO_POSITION_H))
-
-
-
-
-        # 1 CARD_WIDTH//2 - LOGO_WIDTH//2
-        # 2 CARD_WIDTH//2 - 2 * (LOGO_WIDTH//2) ;;;;;;;; CARD_WIDTH//2
-        # 3 CARD_WIDTH//2 - 3 * (LOGO_WIDTH//2) ;;;;;;; CARD_WIDTH//2 - LOGO_WIDTH//2 ;;;;;;;; CARD_WIDTH//2 + LOGO_WIDTH//2
 
     image9[:, :, 3] = 255
 
     cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image9)
+
+
+def replace_color(image, target_color, replacement_color, threshold=40):
+    print(target_color, replacement_color)
+    # Convert target and replacement colors to NumPy arrays
+    target_color = np.array(target_color[:3], dtype=np.uint8)  # Ignore alpha
+    replacement_color = np.array(replacement_color[:3], dtype=np.uint8)  # Ignore alpha
+
+    if image.shape[2] == 4:
+        # Split channels
+        bgr = image[:, :, :3]  # Extract BGR
+        alpha = image[:, :, 3]  # Extract alpha
+    else:
+        bgr = image
+
+    # Iterate over every pixel and replace color if it matches target color within threshold
+    for i in range(bgr.shape[0]):  # Loop over each row
+        for j in range(bgr.shape[1]):  # Loop over each column
+            pixel = bgr[i, j]
+            
+            # Calculate the absolute difference for each channel
+            diff = np.abs(pixel - target_color)
+            
+            # Clamp the differences to avoid overflow (maximum value of 255)
+            diff = np.minimum(diff, 255)
+            
+            # Sum the differences (now clamped at 255)
+            distance = np.sum(diff)
+
+            # If the distance is less than the threshold, replace the color
+            if distance < threshold:
+                bgr[i, j] = replacement_color
+
+    output = bgr
+    # If the image had an alpha channel, merge it back
+    if image.shape[2] == 4:
+        output = cv.merge((output, alpha))
+
+    cv.imshow("", output)
+    cv.waitKey(0)
+
+    return output
 
 
 def read_database(db_path):
