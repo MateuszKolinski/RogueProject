@@ -53,6 +53,11 @@ ALLEGIENCE_HEIGHT = int(130/1400 * CARD_HEIGHT)
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
 
+LOGO_WIDTH = int(55.5 * SCALING_FACTOR)
+LOGO_HEIGHT = int(55.5 * SCALING_FACTOR)
+
+LOGO_POSITION_H = int(1235 / 1400 * CARD_HEIGHT)
+
 LINE_SPACE_HEIGHT = 1
 
 # Constant card colors assigned to database input
@@ -309,7 +314,7 @@ def create_angled_gradients(card_colour_image, card_image, rotation_sign, x_plac
 
 
 # Main card generation function
-def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, attack, mana, health, cost, ability_text, name_text, allegiences, output_path):
+def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, logos_path, attack, mana, health, cost, ability_text, name_text, allegiences, output_path):
     # Essentially sanitizing database output
     if attack == "None":
         attack = "1"
@@ -491,6 +496,19 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     image8 = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START + (NAME_WIDTH_END-NAME_WIDTH_START)/2 - name_text_image.shape[1]/2), NAME_HEIGHT))
     image9 = add_two_images(image8, allegience_text_image, (int(NAME_WIDTH_START + (NAME_WIDTH_END-NAME_WIDTH_START)/2 - allegience_text_image.shape[1]/2), ALLEGIENCE_HEIGHT))
 
+    for i in range(len(allegiences)):
+        logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
+        logo = cv.imread(logo_template, cv.IMREAD_UNCHANGED)
+        logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
+        image9 = add_two_images(image9, logo, (int(CARD_WIDTH // 2 - len(allegiences) * LOGO_WIDTH//2 + i * LOGO_WIDTH), LOGO_POSITION_H))
+
+
+
+
+        # 1 CARD_WIDTH//2 - LOGO_WIDTH//2
+        # 2 CARD_WIDTH//2 - 2 * (LOGO_WIDTH//2) ;;;;;;;; CARD_WIDTH//2
+        # 3 CARD_WIDTH//2 - 3 * (LOGO_WIDTH//2) ;;;;;;; CARD_WIDTH//2 - LOGO_WIDTH//2 ;;;;;;;; CARD_WIDTH//2 + LOGO_WIDTH//2
+
     image9[:, :, 3] = 255
 
     cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image9)
@@ -536,6 +554,7 @@ def main():
                         border_template_path,
                         os.path.join(default_path, characters_directory, card.creature_path),
                         sparks_template_path,
+                        os.path.join(default_path, "Templates"),
                         str(card.attack),
                         str(card.mana),
                         str(card.health),
