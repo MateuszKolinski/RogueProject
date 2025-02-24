@@ -19,7 +19,7 @@ First step after loading the above images is to determine the colors of the card
 
 # One color card
 
-One color card is created by simply changing all non-black pixels in White Card Template to the desired color and then applying a weighted blend with white image which has its opacity turned according to the desired color scheme.
+One color card is created by simply changing all non-black pixels in White Card Template to the desired color.
 
 <img width="200" height="280" alt="One color" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/1color.png">
 
