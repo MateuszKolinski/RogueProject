@@ -61,20 +61,20 @@ LOGO_POSITION_H = int(1235 / 1400 * CARD_HEIGHT)
 LINE_SPACE_HEIGHT = 1
 
 # Constant card colors assigned to database input
-COLOUR_DICT = {"Vampire": (1, 1, 1, 0.2),
-                "Dragon": (0, 0, 250, 0.1),
-                "Human": (203, 192, 255, 0.1),
-                "Horror": (215, 24, 87, 0.1),
-                "Demon": (39, 0, 149, 0),
-                "Undead": (105, 10, 54, 0),
-                "Construct": (128, 128, 128, 0.1),
-                "Angel": (255, 255, 255, 0.7),
-                "Warrior": (0, 25, 41, 0.2),
-                "Mage": (255, 255, 0, 0),
-                "Beast": (0, 102, 0, 0),
-                "Knight": (153, 0, 0, 0.2),
-                "Hunter": (0, 200, 0, 0.3),
-                "Noble": (0, 215, 255, 0.1)
+COLOUR_DICT = {"Vampire": (42, 42, 42),
+                "Dragon": (21, 21, 200),
+                "Human": (166, 158, 204),
+                "Horror": (175, 38, 83),
+                "Demon": (31, 0, 119),
+                "Undead": (43, 8, 84),
+                "Construct": (113, 113, 113),
+                "Angel": (204, 204, 204),
+                "Warrior": (41, 57, 67),
+                "Mage": (204, 204, 0),
+                "Beast": (0, 82, 0),
+                "Knight": (138, 41, 41),
+                "Hunter": (61, 173, 61),
+                "Noble": (21, 175, 204)
                 }
 
 
@@ -359,10 +359,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     if len(allegiences) == 1:
         # Change color of any non-black pixel to a color associated with card's allegience
         colour_image[np.any(card_image.copy()[:, :, :3] != [0, 0, 0], axis=2)] = (COLOUR_DICT[allegiences[0]][0], COLOUR_DICT[allegiences[0]][1], COLOUR_DICT[allegiences[0]][2], 255)
-
-        # White-blend an image over it to 'mellow' the color down a little
-        alpha = COLOUR_DICT[allegiences[0]][3]
-        card_colour_image = cv.addWeighted(card_image.copy(), alpha, colour_image.copy(), 1-alpha, 0.0)
+        card_colour_image = colour_image
     else:
         # Two allegiences which means two color card
         if len(allegiences) == 2:
@@ -373,16 +370,10 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
             right_image = card_image.copy()[:, CARD_WIDTH//2:, :]
             right_image[np.any(right_image[:, :, :3] != [0, 0, 0], axis=2)] = (COLOUR_DICT[allegiences[1]][0], COLOUR_DICT[allegiences[1]][1], COLOUR_DICT[allegiences[1]][2], 255)
 
-            colour_image = cv.hconcat([left_image.copy(), right_image.copy()])
+            card_colour_image = cv.hconcat([left_image.copy(), right_image.copy()])
 
-            alpha = COLOUR_DICT[allegiences[0]][3]
-            left_card_colour_image = cv.addWeighted(card_image.copy()[:, :CARD_WIDTH//2, :], alpha, colour_image.copy()[:, :CARD_WIDTH//2, :], 1-alpha, 0.0)
-            alpha = COLOUR_DICT[allegiences[1]][3]
-            right_card_colour_image = cv.addWeighted(card_image.copy()[:, CARD_WIDTH//2:, :], alpha, colour_image.copy()[:, CARD_WIDTH//2:, :], 1-alpha, 0.0)
-            card_colour_image = cv.hconcat([left_card_colour_image.copy(), right_card_colour_image.copy()])
-
-            gradient_start_colour = left_card_colour_image[-100 * SCALING_FACTOR, 100 * SCALING_FACTOR, :4]
-            gradient_end_colour = right_card_colour_image[-100 * SCALING_FACTOR, -100 * SCALING_FACTOR, :4]
+            gradient_start_colour = left_image[-100 * SCALING_FACTOR, 100 * SCALING_FACTOR, :4]
+            gradient_end_colour = right_image[-100 * SCALING_FACTOR, -100 * SCALING_FACTOR, :4]
             gradient = np.linspace(gradient_start_colour, gradient_end_colour, card_colour_image.shape[1]//3, axis=0).astype(np.uint8)
 
             gradient_image = np.zeros((CARD_HEIGHT, card_colour_image.shape[1]//3, 4), dtype=np.uint8)
@@ -444,10 +435,6 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
                 card_colour_image[np.where(mask_3 == True)] = card_colour_image_3[np.where(mask_3 == True)]
                 card_colour_image[np.where(card_colour_image[:, :, :3] == (0, 0, 0))] = card_colour_image_3[np.where(card_colour_image[:, :, :3] == (0, 0, 0))]
 
-                card_colour_image[mask_1] = cv.addWeighted(card_image[mask_1].copy(), COLOUR_DICT[allegiences[0]][3], card_colour_image[mask_1].copy(), 1 - COLOUR_DICT[allegiences[0]][3], 0.0)
-                card_colour_image[mask_2] = cv.addWeighted(card_image[mask_2].copy(), COLOUR_DICT[allegiences[1]][3], card_colour_image[mask_2].copy(), 1 - COLOUR_DICT[allegiences[1]][3], 0.0)
-                card_colour_image[mask_3] = cv.addWeighted(card_image[mask_3].copy(), COLOUR_DICT[allegiences[2]][3], card_colour_image[mask_3].copy(), 1 - COLOUR_DICT[allegiences[2]][3], 0.0)
-
                 # Gradient left-right
                 # Get gradient starting colors from our image
                 gradient_start_colour = card_colour_image[1, 1, :4]
@@ -470,7 +457,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
                 card_colour_image = create_angled_gradients(card_colour_image, card_image, -1, CARD_WIDTH//2, CARD_WIDTH-1)
 
 
-    card_colour_image = cv.addWeighted(card_colour_image.copy(), 0.8, sparks_image.copy(), 0.2, 0.0)
+    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
     attack_number_image = create_text_image(attack, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
     mana_number_image = create_text_image(mana, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
