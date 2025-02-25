@@ -489,7 +489,8 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         logo = replace_color(logo, [8, 255, 0], [0, 0, 0], 3)
         logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
         logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
-        image9 = add_two_images(image9, logo, (int(CARD_WIDTH // 2 - len(allegiences) * LOGO_WIDTH//2 + i * LOGO_WIDTH), LOGO_POSITION_H))
+        logo = cv.copyMakeBorder(logo.copy(), 0, 0, int(5 * SCALING_FACTOR), int(5 * SCALING_FACTOR), cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
+        image9 = add_two_images(image9, logo, (int(CARD_WIDTH // 2 - len(allegiences) * (LOGO_WIDTH//2 + 5 * SCALING_FACTOR) + i * (LOGO_WIDTH + 5 * SCALING_FACTOR)), LOGO_POSITION_H))
 
     image9[:, :, 3] = 255
 
