@@ -31,16 +31,16 @@ TEXT_WIDTH_END = int(91/100 * CARD_WIDTH)
 TEXT_HEIGHT_START = int(89 / 140 * CARD_HEIGHT)
 
 ATTACK_NUMBER_WIDTH = int(75 / 1000 * CARD_WIDTH)
-ATTACK_NUMBER_HEIGHT = int(1250 / 1400 * CARD_HEIGHT)
+ATTACK_NUMBER_HEIGHT = int(1242 / 1400 * CARD_HEIGHT)
 
 MANA_NUMBER_WIDTH = int(925/1000 * CARD_WIDTH)
-MANA_NUMBER_HEIGHT = int(65/1400 * CARD_HEIGHT)
+MANA_NUMBER_HEIGHT = int(64/1400 * CARD_HEIGHT)
 
 HEALTH_NUMBER_WIDTH = int(925/1000 * CARD_WIDTH)
 HEALTH_NUMBER_HEIGHT = ATTACK_NUMBER_HEIGHT
 
 COST_NUMBER_WIDTH = ATTACK_NUMBER_WIDTH
-COST_NUMBER_HEIGHT = int(65/1400 * CARD_HEIGHT)
+COST_NUMBER_HEIGHT = int(64/1400 * CARD_HEIGHT)
 
 NAME_WIDTH_START = int(13/100 * CARD_WIDTH)
 NAME_WIDTH_END = int(87/100 * CARD_WIDTH)
@@ -62,7 +62,7 @@ LOGO_POSITION_H = int(1233 / 1400 * CARD_HEIGHT)
 LINE_SPACE_HEIGHT = 1
 
 NUMBER_FONT = "Ancient Medium.ttf"
-TEXT_FONT = "Goudy Mediaeval Regular.ttf"
+TEXT_FONT = "Butler_Regular.otf"
 
 # Constant card colors assigned to database input
 COLOUR_DICT = {"Vampire": (42, 42, 42),
@@ -471,10 +471,10 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
-    attack_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
-    mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
-    health_number_image = create_text_image(health, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
-    cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
+    attack_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
+    mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
+    health_number_image = create_text_image(health, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
+    cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
 
     ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
     name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
