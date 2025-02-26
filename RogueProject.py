@@ -11,6 +11,7 @@ import sqlite3
 import os
 import scipy
 import math
+from PIL import Image, ImageDraw, ImageFont
 
 # Scales all objects in the card image
 SCALING_FACTOR = 2
@@ -59,6 +60,9 @@ LOGO_HEIGHT = int(56 * SCALING_FACTOR)
 LOGO_POSITION_H = int(1233 / 1400 * CARD_HEIGHT)
 
 LINE_SPACE_HEIGHT = 1
+
+NUMBER_FONT = "Ancient Medium.ttf"
+TEXT_FONT = "Goudy Mediaeval Regular.ttf"
 
 # Constant card colors assigned to database input
 COLOUR_DICT = {"Vampire": (42, 42, 42),
@@ -140,82 +144,90 @@ def add_two_images(bottom, top, displacement):
     return output_image
 
 
-# Creates an image containing desired text
-def create_text_image(text, size, thickness, colour, font, width):
-    lines = wrap_text(text, size, thickness, font, width)
-    line_images = []
-    for line in lines:
-        temp_image = putText_MK(line, size, thickness, font, colour)
-        temp_image = cv.cvtColor(temp_image, cv.COLOR_RGB2RGBA)
 
-        # Then assign the mask to the last channel of the image
-        temp_image[:, :, 3] = np.ones((temp_image.shape[0], temp_image.shape[1]), np.uint8)
-        
-        temp_image[np.all(temp_image == (0, 0, 0, 1), axis=-1)] = (0, 0, 0, 0)
-        line_images.append(temp_image)
+def create_text_image_PIL(text, size, color, font_path):
+    font = ImageFont.truetype(font_path, size)
 
-    temp = line_images[0]
-    for i in range(len(line_images)-1):
-        temp = add_two_images(temp, line_images[i+1], (0, LINE_SPACE_HEIGHT + line_images[i].shape[0]*(i+1)))
+    # Create a temporary ImageDraw instance to get text size
+    dummy_img = Image.new("RGB", (1, 1))
+    draw = ImageDraw.Draw(dummy_img)
+    
+    # Get the bounding box (top-left to bottom-right coordinates)
+    bbox = draw.textbbox((0, 0), text, font=font)
+    
+    # Extract width and height with precise calculation
+    width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
 
-    return temp
+    # Create an image based on the correct width and height
+    image = np.zeros((height, width, 4), dtype=np.uint8)
+    image_pil = Image.fromarray(image)
 
+    # Draw the text on the image with adjusted positioning
+    draw = ImageDraw.Draw(image_pil)
+    draw.text((-bbox[0], -bbox[1]), text, font=font, fill=color)
 
-# A function cropping a text image to its size, since cv.puttext doesn't do that automatically
-def putText_MK(text, scale, thickness, font, colour):
-    base = np.zeros((2000, 2000, 3), np.uint8)
-    text_img = cv.putText(base, text, (1000, 1000), font, scale, colour, thickness, cv.FILLED)
+    # Convert back to OpenCV format
+    image = np.array(image_pil)
 
-    # Greyscale
-    img = cv.cvtColor(text_img, cv.COLOR_BGR2GRAY)
-
-    # Horizontal close
-    kernel = np.ones((5, 191), np.uint8)
-    morph = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
-
-    # Find contours and bounding rectangle
-    contours, hierarchy = cv.findContours(morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    cnt = contours[0]
-    x,y,w,h = cv.boundingRect(cnt)
-
-    # Crop
-    crop = text_img[y:y+h,x:x+w]
-        
-    return crop
+    return image
 
 
-# Wrapping image text lines
-def wrap_text(text, scale, thickness, font, width):
-    textSize = cv.getTextSize(text, font, scale, thickness)
-    spaceSize = cv.getTextSize(" ", font, scale, thickness)
-    if textSize[0][0] > width:
+def getTextWidth(text, font):
+    # Create a temporary ImageDraw instance to get text size
+    dummy_img = Image.new("RGB", (1, 1))
+    draw = ImageDraw.Draw(dummy_img)
+
+    # Get the bounding box (top-left to bottom-right coordinates)
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+
+    return text_width
+
+
+def wrap_text(text, font, max_width):
+    if getTextWidth(text, font) <= max_width:
+        lines = [text]
+    else:
         textSplit = text.split(" ")
         textSplitLen = []
-        for i in range(len(textSplit)):
-            textSplitLen.append(cv.getTextSize(textSplit[i], font, scale, thickness))
-
         textLenSum = 0
         lines = []
         line = ""
-        for i in range(len(textSplitLen)):
-            if textSplitLen[i][0][0] > width:
-                print("You don goofed up")
+        i = 0
 
-            if textLenSum + textSplitLen[i][0][0] + spaceSize[0][0] > width:
+        spaceLen = getTextWidth(" ", font)
+
+        for i in range(len(textSplit)):
+            textSplitLen.append(getTextWidth(textSplit[i], font))
+
+        for i in range(len(textSplitLen)):
+            if textLenSum + textSplitLen[i] + spaceLen > max_width:
                 lines.append(line)
                 line = ""
                 textLenSum = 0
 
-            textLenSum = textLenSum + textSplitLen[i][0][0] + spaceSize[0][0]
-            line = line + " " + textSplit[i]
+            textLenSum = textLenSum + textSplitLen[i] + spaceLen
+
+            if line == "":
+                line = textSplit[i]
+            else:
+                line = line + " " + textSplit[i]
 
         if lines[-1] != line:
             lines.append(line)
-
-        return lines
     
-    text_list = [text]
-    return text_list
+    return lines
+
+
+def create_text_image(text, font_path, fontSize, color):
+    font = ImageFont.truetype(font_path, fontSize)
+    lines = wrap_text(text, font, TEXT_WIDTH_END - TEXT_WIDTH_START)
+    text_image = create_text_image_PIL(lines[0], fontSize, color, font_path)
+    for i in range(len(lines)-1):
+        image = create_text_image_PIL(lines[i+1], fontSize, color, font_path)
+        text_image = add_two_images(text_image, image, (0, LINE_SPACE_HEIGHT + text_image.shape[0]))
+
+    return text_image
 
 
 # Cropping an image to content, used for morphological operations on angled gradients in tricolor card images
@@ -459,14 +471,14 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
-    attack_number_image = create_text_image(attack, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
-    mana_number_image = create_text_image(mana, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
-    health_number_image = create_text_image(health, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
-    cost_number_image = create_text_image(cost, 4 * SCALING_FACTOR, 6, (1, 1, 1), cv.FONT_HERSHEY_PLAIN, int(CARD_WIDTH/3))
+    attack_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
+    mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
+    health_number_image = create_text_image(health, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
+    cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), 70 * SCALING_FACTOR, (1, 1, 1, 255))
 
-    ability_text_image = create_text_image(ability_text, 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, TEXT_WIDTH_END - TEXT_WIDTH_START)
-    name_text_image = create_text_image(name_text, 0.7 * SCALING_FACTOR, 3, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
-    allegience_text_image = create_text_image(" ".join(allegiences), 0.5 * SCALING_FACTOR, 2, (1, 1, 1), cv.FONT_HERSHEY_COMPLEX, NAME_WIDTH_END - NAME_WIDTH_START)
+    ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
+    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
+    allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
 
     creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
