@@ -28,7 +28,7 @@ NUMBER_HEIGHT = 100 * SCALING_FACTOR
 
 TEXT_WIDTH_START = int(9/100 * CARD_WIDTH)
 TEXT_WIDTH_END = int(91/100 * CARD_WIDTH)
-TEXT_HEIGHT_START = int(89 / 140 * CARD_HEIGHT)
+TEXT_HEIGHT_START = int(86 / 140 * CARD_HEIGHT)
 TEXT_HEIGHT_END = int(1188/1400 * CARD_HEIGHT)
 
 POWER_NUMBER_POSITION_W = int(500 / 1000 * CARD_WIDTH)
@@ -50,23 +50,22 @@ COST_NUMBER_COLOR = (1, 1, 1, 255)
 
 NAME_WIDTH_START = int(63/1000 * CARD_WIDTH)
 NAME_WIDTH_END = int(87/100 * CARD_WIDTH)
-NAME_HEIGHT = int(110/1400 * CARD_HEIGHT)
+NAME_HEIGHT = int(96/1400 * CARD_HEIGHT)
 
 CREATURE_WIDTH = 448 * SCALING_FACTOR
 CREATURE_HEIGHT = 343 * SCALING_FACTOR
 
-ALLEGIENCE_HEIGHT = int(54/1400 * CARD_HEIGHT)
+ALLEGIENCE_HEIGHT = int(55/1400 * CARD_HEIGHT)
 
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
 
-LOGO_WIDTH = int(43 * SCALING_FACTOR)
-LOGO_HEIGHT = int(43 * SCALING_FACTOR)
+LOGO_WIDTH = int(28.5 * SCALING_FACTOR)
+LOGO_HEIGHT = int(28.5 * SCALING_FACTOR)
 LOGO_BORDER_WIDTH = int(3 * SCALING_FACTOR)
 
 LOGO_POSITION_W = int(946/1000 * CARD_WIDTH)
-LOGO_POSITION_H = int(81/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
-
+LOGO_POSITION_H = int(79/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
 
 LINE_SPACE_HEIGHT = 1
 
@@ -489,12 +488,11 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     allegience_text_images = []
     for i in range(len(allegiences)):
-        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 10 * SCALING_FACTOR, (1, 1, 1, 255)))
-
+        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 8 * SCALING_FACTOR, (1, 1, 1, 255)))
 
     #allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
 
-    creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
+    creature_image = cv.copyMakeBorder(creature_image.copy(), 71 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
     creature_n_border = add_two_images(creature_image, border_template, (0, 0))
 
