@@ -11,6 +11,7 @@ import sqlite3
 import os
 import scipy
 import math
+import traceback
 from PIL import Image, ImageDraw, ImageFont
 
 # Scales all objects in the card image
@@ -27,37 +28,45 @@ NUMBER_HEIGHT = 100 * SCALING_FACTOR
 
 TEXT_WIDTH_START = int(9/100 * CARD_WIDTH)
 TEXT_WIDTH_END = int(91/100 * CARD_WIDTH)
-
 TEXT_HEIGHT_START = int(89 / 140 * CARD_HEIGHT)
+TEXT_HEIGHT_END = int(1188/1400 * CARD_HEIGHT)
 
-ATTACK_NUMBER_WIDTH = int(75 / 1000 * CARD_WIDTH)
-ATTACK_NUMBER_HEIGHT = int(1242 / 1400 * CARD_HEIGHT)
+POWER_NUMBER_POSITION_W = int(500 / 1000 * CARD_WIDTH)
+POWER_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+POWER_NUMBER_SIZE = 75 * SCALING_FACTOR
+POWER_NUMBER_COLOR = (1, 1, 1, 255)
 
-MANA_NUMBER_WIDTH = int(925/1000 * CARD_WIDTH)
-MANA_NUMBER_HEIGHT = int(64/1400 * CARD_HEIGHT)
+# Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
+MANA_NUMBER_POSITION_W = int(925/1000 * CARD_WIDTH)
+MANA_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+MANA_NUMBER_SIZE = 75 * SCALING_FACTOR
+MANA_NUMBER_COLOR = (1, 1, 1, 255)
 
-HEALTH_NUMBER_WIDTH = int(925/1000 * CARD_WIDTH)
-HEALTH_NUMBER_HEIGHT = ATTACK_NUMBER_HEIGHT
+# Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
+COST_NUMBER_POSITION_W = int(75 / 1000 * CARD_WIDTH)
+COST_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+COST_NUMBER_SIZE = 75 * SCALING_FACTOR
+COST_NUMBER_COLOR = (1, 1, 1, 255)
 
-COST_NUMBER_WIDTH = ATTACK_NUMBER_WIDTH
-COST_NUMBER_HEIGHT = int(64/1400 * CARD_HEIGHT)
-
-NAME_WIDTH_START = int(13/100 * CARD_WIDTH)
+NAME_WIDTH_START = int(63/1000 * CARD_WIDTH)
 NAME_WIDTH_END = int(87/100 * CARD_WIDTH)
-NAME_HEIGHT = COST_NUMBER_HEIGHT
+NAME_HEIGHT = int(110/1400 * CARD_HEIGHT)
 
 CREATURE_WIDTH = 448 * SCALING_FACTOR
 CREATURE_HEIGHT = 343 * SCALING_FACTOR
 
-ALLEGIENCE_HEIGHT = int(130/1400 * CARD_HEIGHT)
+ALLEGIENCE_HEIGHT = int(54/1400 * CARD_HEIGHT)
 
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
 
-LOGO_WIDTH = int(56 * SCALING_FACTOR)
-LOGO_HEIGHT = int(56 * SCALING_FACTOR)
+LOGO_WIDTH = int(43 * SCALING_FACTOR)
+LOGO_HEIGHT = int(43 * SCALING_FACTOR)
+LOGO_BORDER_WIDTH = int(3 * SCALING_FACTOR)
 
-LOGO_POSITION_H = int(1233 / 1400 * CARD_HEIGHT)
+LOGO_POSITION_W = int(946/1000 * CARD_WIDTH)
+LOGO_POSITION_H = int(81/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
+
 
 LINE_SPACE_HEIGHT = 1
 
@@ -471,14 +480,19 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
-    attack_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
-    mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
-    health_number_image = create_text_image(health, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
-    cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), 75 * SCALING_FACTOR, (1, 1, 1, 255))
+    power_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
+    mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), MANA_NUMBER_SIZE, MANA_NUMBER_COLOR)
+    cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), COST_NUMBER_SIZE, COST_NUMBER_COLOR)
 
     ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
-    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
-    allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
+    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 20 * SCALING_FACTOR, (1, 1, 1, 255))
+
+    allegience_text_images = []
+    for i in range(len(allegiences)):
+        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 10 * SCALING_FACTOR, (1, 1, 1, 255)))
+
+
+    #allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
 
     creature_image = cv.copyMakeBorder(creature_image.copy(), 86 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
@@ -487,13 +501,13 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
     creature_n_border_n_colour[:, :, 3] = 255
 
-    image3 = add_two_images(creature_n_border_n_colour, attack_number_image, (ATTACK_NUMBER_WIDTH, ATTACK_NUMBER_HEIGHT))
-    image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_WIDTH - int(mana_number_image.shape[1]), MANA_NUMBER_HEIGHT))
-    image5 = add_two_images(image4, health_number_image, (HEALTH_NUMBER_WIDTH - health_number_image.shape[1], HEALTH_NUMBER_HEIGHT))
-    image6 = add_two_images(image5, cost_number_image, (COST_NUMBER_WIDTH, COST_NUMBER_HEIGHT))
+    image3 = add_two_images(creature_n_border_n_colour, power_number_image, (POWER_NUMBER_POSITION_W - power_number_image.shape[1]//2, POWER_NUMBER_POSITION_H))
+    image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_POSITION_W - mana_number_image.shape[1], MANA_NUMBER_POSITION_H))
+    image6 = add_two_images(image4, cost_number_image, (COST_NUMBER_POSITION_W, COST_NUMBER_POSITION_H))
     image7 = add_two_images(image6, ability_text_image, (TEXT_WIDTH_START, TEXT_HEIGHT_START))
-    image8 = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START + (NAME_WIDTH_END-NAME_WIDTH_START)/2 - name_text_image.shape[1]/2), NAME_HEIGHT))
-    image9 = add_two_images(image8, allegience_text_image, (int(NAME_WIDTH_START + (NAME_WIDTH_END-NAME_WIDTH_START)/2 - allegience_text_image.shape[1]/2), ALLEGIENCE_HEIGHT))
+    image = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START), NAME_HEIGHT - name_text_image.shape[0]//2))
+    for i in range(len(allegiences)):
+        image = add_two_images(image, allegience_text_images[i], (LOGO_POSITION_W + LOGO_WIDTH//2 - allegience_text_images[i].shape[0] - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_HEIGHT))
 
     for i in range(len(allegiences)):
         logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
@@ -501,12 +515,12 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         logo = replace_color(logo, [8, 255, 0], [0, 0, 0], 3)
         logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
         logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
-        logo = cv.copyMakeBorder(logo.copy(), 0, 0, int(4 * SCALING_FACTOR), int(4 * SCALING_FACTOR), cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
-        image9 = add_two_images(image9, logo, (int(CARD_WIDTH // 2 - len(allegiences) * (LOGO_WIDTH//2 + 4 * SCALING_FACTOR) + i * (LOGO_WIDTH + 4 * SCALING_FACTOR)), LOGO_POSITION_H))
+        logo = cv.copyMakeBorder(logo.copy(), LOGO_BORDER_WIDTH, 0, LOGO_BORDER_WIDTH, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
+        image = add_two_images(image, logo, (LOGO_POSITION_W - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), LOGO_POSITION_H))
 
-    image9[:, :, 3] = 255
+    image[:, :, 3] = 255
 
-    cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image9)
+    cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image)
 
 
 def replace_color(image, target_color, replacement_color, threshold=40):
@@ -594,6 +608,8 @@ def main():
             
         except Exception as e:
             print(f"Error processing card '{card.name}': {e}")
+            print(traceback.format_exc())
+
 
 if __name__ == "__main__":
     main()
