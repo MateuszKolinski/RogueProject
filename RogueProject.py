@@ -34,19 +34,19 @@ TEXT_HEIGHT_END = int(1188/1400 * CARD_HEIGHT)
 POWER_NUMBER_POSITION_W = int(500 / 1000 * CARD_WIDTH)
 POWER_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
 POWER_NUMBER_SIZE = 75 * SCALING_FACTOR
-POWER_NUMBER_COLOR = (1, 1, 1, 255)
+POWER_NUMBER_COLOR = (9, 9, 235, 255)
 
 # Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
 MANA_NUMBER_POSITION_W = int(925/1000 * CARD_WIDTH)
 MANA_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
 MANA_NUMBER_SIZE = 75 * SCALING_FACTOR
-MANA_NUMBER_COLOR = (1, 1, 1, 255)
+MANA_NUMBER_COLOR = (255, 150, 0, 255)
 
 # Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
 COST_NUMBER_POSITION_W = int(75 / 1000 * CARD_WIDTH)
 COST_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
 COST_NUMBER_SIZE = 75 * SCALING_FACTOR
-COST_NUMBER_COLOR = (1, 1, 1, 255)
+COST_NUMBER_COLOR = (28, 157, 255, 255)
 
 NAME_WIDTH_START = int(63/1000 * CARD_WIDTH)
 NAME_WIDTH_END = int(87/100 * CARD_WIDTH)
@@ -60,17 +60,17 @@ ALLEGIENCE_HEIGHT = int(55/1400 * CARD_HEIGHT)
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
 TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
 
-LOGO_WIDTH = int(28.5 * SCALING_FACTOR)
-LOGO_HEIGHT = int(28.5 * SCALING_FACTOR)
+LOGO_WIDTH = int(27.5 * SCALING_FACTOR)
+LOGO_HEIGHT = int(27.5 * SCALING_FACTOR)
 LOGO_BORDER_WIDTH = int(3 * SCALING_FACTOR)
 
 LOGO_POSITION_W = int(946/1000 * CARD_WIDTH)
-LOGO_POSITION_H = int(79/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
+LOGO_POSITION_H = int(81/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
 
 LINE_SPACE_HEIGHT = 1
 
 NUMBER_FONT = "Ancient Medium.ttf"
-TEXT_FONT = "Butler_Regular.otf"
+TEXT_FONT = "ButlerModified.otf"
 
 # Constant card colors assigned to database input
 COLOUR_DICT = {"Vampire": (42, 42, 42),
@@ -484,11 +484,11 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), COST_NUMBER_SIZE, COST_NUMBER_COLOR)
 
     ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
-    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 20 * SCALING_FACTOR, (1, 1, 1, 255))
+    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
 
     allegience_text_images = []
     for i in range(len(allegiences)):
-        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 8 * SCALING_FACTOR, (1, 1, 1, 255)))
+        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 9.5 * SCALING_FACTOR, (1, 1, 1, 255)))
 
     #allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
 
@@ -505,7 +505,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     image7 = add_two_images(image6, ability_text_image, (TEXT_WIDTH_START, TEXT_HEIGHT_START))
     image = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START), NAME_HEIGHT - name_text_image.shape[0]//2))
     for i in range(len(allegiences)):
-        image = add_two_images(image, allegience_text_images[i], (LOGO_POSITION_W + LOGO_WIDTH//2 - allegience_text_images[i].shape[0] - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_HEIGHT))
+        image = add_two_images(image, allegience_text_images[i], (LOGO_POSITION_W + (LOGO_WIDTH + 2 * LOGO_BORDER_WIDTH)//2 - allegience_text_images[i].shape[1]//2 - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_HEIGHT))
 
     for i in range(len(allegiences)):
         logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
