@@ -531,10 +531,10 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image)
 
 
-# Draws a 1 pixel outline around an image
+# Draws a 2 pixel outline around an image
 def image_outline(input):
     # Pad the image so that dilatation fits in it
-    image = cv.copyMakeBorder(input.copy(), 1, 1, 1, 1, cv.BORDER_CONSTANT, value=(0, 0, 0, 0))
+    image = cv.copyMakeBorder(input.copy(), 2, 2, 2, 2, cv.BORDER_CONSTANT, value=(0, 0, 0, 0))
 
     # Turn all non-transparent pixels fully opaque
     mask = image[:, :, 3] > 0
@@ -547,7 +547,7 @@ def image_outline(input):
     gray_image[gray_image > 0] = 255
 
     # Dilate white area
-    dilated = cv.dilate(gray_image, np.ones((3, 3), np.uint8), iterations=1)
+    dilated = cv.dilate(gray_image, np.ones((5, 5), np.uint8), iterations=1)
 
     # Switch colors, black to white and white to black
     dilated_corrected = 255 - dilated
@@ -560,7 +560,7 @@ def image_outline(input):
     color_image[mask, 3] = 0
 
     # Overlay input image on top of dilated image
-    output = add_two_images(color_image, input, (1, 1))
+    output = add_two_images(color_image, input, (2, 2))
 
     return output
 
