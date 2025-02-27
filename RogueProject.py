@@ -480,8 +480,13 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
     power_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
+    power_number_image = image_outline(power_number_image)
+
     mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), MANA_NUMBER_SIZE, MANA_NUMBER_COLOR)
+    mana_number_image = image_outline(mana_number_image)
+
     cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), COST_NUMBER_SIZE, COST_NUMBER_COLOR)
+    cost_number_image = image_outline(cost_number_image)
 
     ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
     name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
@@ -524,6 +529,40 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     image[:, :, 3] = 255
 
     cv.imwrite(os.path.join(output_path, str(name_text) + ".png"), image)
+
+
+# Draws a 1 pixel outline around an image
+def image_outline(input):
+    # Pad the image so that dilatation fits in it
+    image = cv.copyMakeBorder(input.copy(), 1, 1, 1, 1, cv.BORDER_CONSTANT, value=(0, 0, 0, 0))
+
+    # Turn all non-transparent pixels fully opaque
+    mask = image[:, :, 3] > 0
+    image[mask, :3] = 255
+
+    # Convert to grayscale
+    gray_image = cv.cvtColor(image, cv.COLOR_BGRA2GRAY)
+
+    # Turn all non-black pixels white
+    gray_image[gray_image > 0] = 255
+
+    # Dilate white area
+    dilated = cv.dilate(gray_image, np.ones((3, 3), np.uint8), iterations=1)
+
+    # Switch colors, black to white and white to black
+    dilated_corrected = 255 - dilated
+
+    # Convert to rgba
+    color_image = cv.cvtColor(dilated_corrected, cv.COLOR_GRAY2BGRA)
+
+    # Turn all black pixels transparent
+    mask = np.all(color_image[:, :, :3] == [255, 255, 255], axis=-1)
+    color_image[mask, 3] = 0
+
+    # Overlay input image on top of dilated image
+    output = add_two_images(color_image, input, (1, 1))
+
+    return output
 
 
 def replace_color(image, target_color, replacement_color, threshold=40):
