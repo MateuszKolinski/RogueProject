@@ -494,7 +494,21 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     creature_image = cv.copyMakeBorder(creature_image.copy(), 71 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
-    creature_n_border = add_two_images(creature_image, border_template, (0, 0))
+    image = border_template
+    for i in range(len(allegiences)):
+        logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
+        logo = cv.imread(logo_template, cv.IMREAD_UNCHANGED)
+        logo = replace_color(logo, [8, 255, 0], [0, 0, 0], 3)
+        logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
+        logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
+        logo = cv.copyMakeBorder(logo.copy(), LOGO_BORDER_WIDTH, 0, LOGO_BORDER_WIDTH, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
+        image = add_two_images(image, logo, (LOGO_POSITION_W - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), LOGO_POSITION_H))
+
+    # Adding border template once again, because we want it on top of allegience symbols
+    # This technically should be fixed in add_two_images, but that function isn't doing great when the bottom image is smaller than the top one
+    image = add_two_images(image, border_template, (0, 0))
+
+    creature_n_border = add_two_images(creature_image, image, (0, 0))
 
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
     creature_n_border_n_colour[:, :, 3] = 255
@@ -506,15 +520,6 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     image = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START), NAME_HEIGHT - name_text_image.shape[0]//2))
     for i in range(len(allegiences)):
         image = add_two_images(image, allegience_text_images[i], (LOGO_POSITION_W + (LOGO_WIDTH + 2 * LOGO_BORDER_WIDTH)//2 - allegience_text_images[i].shape[1]//2 - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_HEIGHT))
-
-    for i in range(len(allegiences)):
-        logo_template = os.path.join(logos_path, ("Logo" + allegiences[i] + ".png"))
-        logo = cv.imread(logo_template, cv.IMREAD_UNCHANGED)
-        logo = replace_color(logo, [8, 255, 0], [0, 0, 0], 3)
-        logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
-        logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
-        logo = cv.copyMakeBorder(logo.copy(), LOGO_BORDER_WIDTH, 0, LOGO_BORDER_WIDTH, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
-        image = add_two_images(image, logo, (LOGO_POSITION_W - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), LOGO_POSITION_H))
 
     image[:, :, 3] = 255
 
