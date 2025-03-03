@@ -21,54 +21,67 @@ SCALING_FACTOR = 2
 CARD_WIDTH = 500 * SCALING_FACTOR
 CARD_HEIGHT = 700 * SCALING_FACTOR
 
-COLOUR_THRESHOLD = (0.001, 0.001, 0.001)
+# Ability text
+ABILITY_TEXT_WIDTH_START = int(9/100 * CARD_WIDTH)
+ABILITY_TEXT_WIDTH_END = int(91/100 * CARD_WIDTH)
+ABILITY_TEXT_HEIGHT_START = int(86 / 140 * CARD_HEIGHT)
+ABILITY_TEXT_SIZE = 15 * SCALING_FACTOR
+ABILITY_TEXT_COLOR = (1, 1, 1, 255)
 
-NUMBER_WIDTH = 100 * SCALING_FACTOR
-NUMBER_HEIGHT = 100 * SCALING_FACTOR
-
-TEXT_WIDTH_START = int(9/100 * CARD_WIDTH)
-TEXT_WIDTH_END = int(91/100 * CARD_WIDTH)
-TEXT_HEIGHT_START = int(86 / 140 * CARD_HEIGHT)
-TEXT_HEIGHT_END = int(1188/1400 * CARD_HEIGHT)
-
-POWER_NUMBER_POSITION_W = int(500 / 1000 * CARD_WIDTH)
-POWER_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+# Power number position
+POWER_NUMBER_WIDTH_START = int(500 / 1000 * CARD_WIDTH)
+POWER_NUMBER_HEIGHT_START = int(1242 / 1400 * CARD_HEIGHT)
 POWER_NUMBER_SIZE = 75 * SCALING_FACTOR
 POWER_NUMBER_COLOR = (9, 9, 235, 255)
 
+# Mana number position
 # Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
-MANA_NUMBER_POSITION_W = int(925/1000 * CARD_WIDTH)
-MANA_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+MANA_NUMBER_WIDTH_START = int(925/1000 * CARD_WIDTH)
+MANA_NUMBER_HEIGHT_START = int(1242 / 1400 * CARD_HEIGHT)
 MANA_NUMBER_SIZE = 75 * SCALING_FACTOR
 MANA_NUMBER_COLOR = (255, 150, 0, 255)
 
+# Cost number position
 # Position x (width) isn't absolute. It needs to be adjusted by taking into account the width of an image
-COST_NUMBER_POSITION_W = int(75 / 1000 * CARD_WIDTH)
-COST_NUMBER_POSITION_H = int(1242 / 1400 * CARD_HEIGHT)
+COST_NUMBER_WIDTH_START = int(75 / 1000 * CARD_WIDTH)
+COST_NUMBER_HEIGHT_START = int(1242 / 1400 * CARD_HEIGHT)
 COST_NUMBER_SIZE = 75 * SCALING_FACTOR
 COST_NUMBER_COLOR = (28, 157, 255, 255)
 
-NAME_WIDTH_START = int(63/1000 * CARD_WIDTH)
-NAME_WIDTH_END = int(87/100 * CARD_WIDTH)
-NAME_HEIGHT = int(96/1400 * CARD_HEIGHT)
+# Card name position
+NAME_TEXT_WIDTH_START = int(63/1000 * CARD_WIDTH)
+NAME_TEXT_WIDTH_END = int(87/100 * CARD_WIDTH)
+NAME_TEXT_HEIGHT_START = int(96/1400 * CARD_HEIGHT)
+NAME_TEXT_SIZE = 30 * SCALING_FACTOR
+NAME_COLOR = (1, 1, 1, 255)
 
-CREATURE_WIDTH = 448 * SCALING_FACTOR
-CREATURE_HEIGHT = 343 * SCALING_FACTOR
+# Main character image
+CREATURE_IMAGE_WIDTH = 448 * SCALING_FACTOR
+CREATURE_IMAGE_HEIGHT = 343 * SCALING_FACTOR
+CREATURE_IMAGE_HEIGHT_START = 71 * SCALING_FACTOR
+CREATURE_IMAGE_WIDTH_START = 27 * SCALING_FACTOR
+CREATURE_IMAGE_ROUNDING_RADIUS = 30
 
-ALLEGIENCE_HEIGHT = int(55/1400 * CARD_HEIGHT)
+# Allegience text
+ALLEGIENCE_TEXT_HEIGHT = int(55/1400 * CARD_HEIGHT)
+ALLEGIENCE_TEXT_SIZE = 9.5 * SCALING_FACTOR
+ALLEGIENCE_TEXT_COLOR = (1, 1, 1, 255)
 
-TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
-TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
-
+# Allegience logos
 LOGO_WIDTH = int(27.5 * SCALING_FACTOR)
 LOGO_HEIGHT = int(27.5 * SCALING_FACTOR)
 LOGO_BORDER_WIDTH = int(3 * SCALING_FACTOR)
+LOGO_WIDTH_START = int(946/1000 * CARD_WIDTH)
+LOGO_HEIGHT_START = int(81/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
 
-LOGO_POSITION_W = int(946/1000 * CARD_WIDTH)
-LOGO_POSITION_H = int(81/1400 * CARD_HEIGHT) - LOGO_BORDER_WIDTH
-
+# Space between next line of text
 LINE_SPACE_HEIGHT = 1
 
+# Heights of vertixes making a color triangle
+TRICOLOR_TRIANGLE_VERTICE_HEIGHT1 = 450 * SCALING_FACTOR
+TRICOLOR_TRIANGLE_VERTICE_HEIGHT2 = 325 * SCALING_FACTOR
+
+# Fonts used
 NUMBER_FONT = "Ancient Medium.ttf"
 TEXT_FONT = "ButlerModified.otf"
 
@@ -90,6 +103,7 @@ COLOUR_DICT = {"Vampire": (42, 42, 42),
                 }
 
 
+# Main class for card
 class Card:
     def __init__(self, name, ability_text, mana, attack, health, cost, creature_path, **allegiances):
         self.name = name
@@ -229,7 +243,7 @@ def wrap_text(text, font, max_width):
 
 def create_text_image(text, font_path, fontSize, color):
     font = ImageFont.truetype(font_path, fontSize)
-    lines = wrap_text(text, font, TEXT_WIDTH_END - TEXT_WIDTH_START)
+    lines = wrap_text(text, font, ABILITY_TEXT_WIDTH_END - ABILITY_TEXT_WIDTH_START)
     text_image = create_text_image_PIL(lines[0], fontSize, color, font_path)
     for i in range(len(lines)-1):
         image = create_text_image_PIL(lines[i+1], fontSize, color, font_path)
@@ -362,7 +376,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     border_template = cv.resize(border_template, (CARD_WIDTH, CARD_HEIGHT), interpolation = cv.INTER_AREA)
 
     creature_image = cv.imread(creature_image_path, cv.IMREAD_UNCHANGED)
-    creature_image = cv.resize(creature_image, (CREATURE_WIDTH, CREATURE_HEIGHT), interpolation = cv.INTER_AREA)
+    creature_image = cv.resize(creature_image, (CREATURE_IMAGE_WIDTH, CREATURE_IMAGE_HEIGHT), interpolation = cv.INTER_AREA)
 
     # Adding alpha channel if it's not present yet
     if creature_image.shape[2] != 4:
@@ -373,7 +387,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         creature_image[:, :, 3] = np.ones((creature_image.shape[0], creature_image.shape[1]), np.uint8)
 
     creature_image[:, :, 3] = 255
-    creature_image = round_corners(creature_image, 30)
+    creature_image = round_corners(creature_image, CREATURE_IMAGE_ROUNDING_RADIUS)
 
     # One allegience which means one color card
     if len(allegiences) == 1:
@@ -488,16 +502,15 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     cost_number_image = create_text_image(cost, os.path.join(logos_path, NUMBER_FONT), COST_NUMBER_SIZE, COST_NUMBER_COLOR)
     cost_number_image = image_outline(cost_number_image)
 
-    ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
-    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), 30 * SCALING_FACTOR, (1, 1, 1, 255))
+    ability_text_image = create_text_image(ability_text, os.path.join(logos_path, TEXT_FONT), ABILITY_TEXT_SIZE, ABILITY_TEXT_COLOR)
+
+    name_text_image = create_text_image(name_text, os.path.join(logos_path, TEXT_FONT), NAME_TEXT_SIZE, NAME_COLOR)
 
     allegience_text_images = []
     for i in range(len(allegiences)):
-        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), 9.5 * SCALING_FACTOR, (1, 1, 1, 255)))
+        allegience_text_images.append(create_text_image(allegiences[i], os.path.join(logos_path, TEXT_FONT), ALLEGIENCE_TEXT_SIZE, ALLEGIENCE_TEXT_COLOR))
 
-    #allegience_text_image = create_text_image(" ".join(allegiences), os.path.join(logos_path, TEXT_FONT), 15 * SCALING_FACTOR, (1, 1, 1, 255))
-
-    creature_image = cv.copyMakeBorder(creature_image.copy(), 71 * SCALING_FACTOR, 0, 27 * SCALING_FACTOR, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
+    creature_image = cv.copyMakeBorder(creature_image.copy(), CREATURE_IMAGE_HEIGHT_START, 0, CREATURE_IMAGE_WIDTH_START, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 0))
 
     image = border_template
     for i in range(len(allegiences)):
@@ -507,7 +520,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         logo = replace_color(logo, [255, 255, 255], [COLOUR_DICT[allegiences[i]][0], COLOUR_DICT[allegiences[i]][1], COLOUR_DICT[allegiences[i]][2]], 3)
         logo = cv.resize(logo, (LOGO_WIDTH, LOGO_HEIGHT), interpolation = cv.INTER_AREA)
         logo = cv.copyMakeBorder(logo.copy(), LOGO_BORDER_WIDTH, 0, LOGO_BORDER_WIDTH, 0, cv.BORDER_CONSTANT, None, (0, 0, 0, 255))
-        image = add_two_images(image, logo, (LOGO_POSITION_W - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), LOGO_POSITION_H))
+        image = add_two_images(image, logo, (LOGO_WIDTH_START - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), LOGO_HEIGHT_START))
 
     # Adding border template once again, because we want it on top of allegience symbols
     # This technically should be fixed in add_two_images, but that function isn't doing great when the bottom image is smaller than the top one
@@ -518,13 +531,13 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
     creature_n_border_n_colour[:, :, 3] = 255
 
-    image3 = add_two_images(creature_n_border_n_colour, power_number_image, (POWER_NUMBER_POSITION_W - power_number_image.shape[1]//2, POWER_NUMBER_POSITION_H))
-    image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_POSITION_W - mana_number_image.shape[1], MANA_NUMBER_POSITION_H))
-    image6 = add_two_images(image4, cost_number_image, (COST_NUMBER_POSITION_W, COST_NUMBER_POSITION_H))
-    image7 = add_two_images(image6, ability_text_image, (TEXT_WIDTH_START, TEXT_HEIGHT_START))
-    image = add_two_images(image7, name_text_image, (int(NAME_WIDTH_START), NAME_HEIGHT - name_text_image.shape[0]//2))
+    image3 = add_two_images(creature_n_border_n_colour, power_number_image, (POWER_NUMBER_WIDTH_START - power_number_image.shape[1]//2, POWER_NUMBER_HEIGHT_START))
+    image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_WIDTH_START - mana_number_image.shape[1], MANA_NUMBER_HEIGHT_START))
+    image6 = add_two_images(image4, cost_number_image, (COST_NUMBER_WIDTH_START, COST_NUMBER_HEIGHT_START))
+    image7 = add_two_images(image6, ability_text_image, (ABILITY_TEXT_WIDTH_START, ABILITY_TEXT_HEIGHT_START))
+    image = add_two_images(image7, name_text_image, (int(NAME_TEXT_WIDTH_START), NAME_TEXT_HEIGHT_START - name_text_image.shape[0]//2))
     for i in range(len(allegiences)):
-        image = add_two_images(image, allegience_text_images[i], (LOGO_POSITION_W + (LOGO_WIDTH + 2 * LOGO_BORDER_WIDTH)//2 - allegience_text_images[i].shape[1]//2 - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_HEIGHT))
+        image = add_two_images(image, allegience_text_images[i], (LOGO_WIDTH_START + (LOGO_WIDTH + 2 * LOGO_BORDER_WIDTH)//2 - allegience_text_images[i].shape[1]//2 - (len(allegiences) - i) * (LOGO_WIDTH + LOGO_BORDER_WIDTH), ALLEGIENCE_TEXT_HEIGHT))
 
     image[:, :, 3] = 255
 
