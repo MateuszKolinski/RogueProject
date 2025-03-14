@@ -103,14 +103,13 @@ COLOUR_DICT = {"Vampire": (42, 42, 42),
                 }
 
 
-# Main class for card
+# Main card class
 class Card:
-    def __init__(self, name, ability_text, mana, attack, health, cost, creature_path, **allegiances):
+    def __init__(self, name, ability_text, power, mana, cost, creature_path, **allegiances):
         self.name = name
         self.ability_text = ability_text
         self.mana = mana
-        self.attack = attack
-        self.health = health
+        self.power = power
         self.cost = cost
         self.creature_path = creature_path
 
@@ -161,10 +160,8 @@ def add_two_images(bottom, top, displacement):
             displaced_top[y + displacement[1], x + displacement[0]] = top[y, x]
 
     output_image[np.where(displaced_top[:, :, 3] >= 0.001)] = displaced_top[np.where(displaced_top[:, :, 3] >= 0.001)]
-    # output_image[np.where(displaced_top[:, :, :3] >= COLOUR_THRESHOLD)] = displaced_top[np.where(displaced_top[:, :, 3] >= COLOUR_THRESHOLD)]
 
     return output_image
-
 
 
 def create_text_image_PIL(text, size, color, font_path):
@@ -348,12 +345,10 @@ def create_angled_gradients(card_colour_image, card_image, rotation_sign, x_plac
 
 
 # Main card generation function
-def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, logos_path, attack, mana, health, cost, ability_text, name_text, allegiences, output_path):
+def create_card(card_template_path, border_template_path, creature_image_path, sparks_path, logos_path, power, mana, cost, ability_text, name_text, allegiences, output_path):
     # Essentially sanitizing database output
-    if attack == "None":
-        attack = "1"
-    if health == "None":
-        health = "1"
+    if power == "None":
+        power = "1"
     if mana == "None":
         mana = "1"
     if cost == "None":
@@ -493,7 +488,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
 
-    power_number_image = create_text_image(attack, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
+    power_number_image = create_text_image(power, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
     power_number_image = image_outline(power_number_image)
 
     mana_number_image = create_text_image(mana, os.path.join(logos_path, NUMBER_FONT), MANA_NUMBER_SIZE, MANA_NUMBER_COLOR)
@@ -618,7 +613,7 @@ def read_database(db_path):
     record_list = [a for a in cursor.execute("SELECT * FROM CARDS")]
     cards = []
     for record in record_list:
-        cards.append(Card(record[1], record[2], record[3], record[4], record[5], record[6], record[7], vampire=record[8], dragon=record[9], human=record[10], horror=record[11], demon=record[12], undead=record[13], construct=record[14], angel=record[15], warrior=record[16], mage=record[17], beast=record[18], knight=record[19], hunter=record[20], noble=record[21]))
+        cards.append(Card(record[1], record[2], record[3], record[4], record[5], record[6], vampire=record[7], dragon=record[8], human=record[9], horror=record[10], demon=record[11], undead=record[12], construct=record[13], angel=record[14], warrior=record[15], mage=record[16], beast=record[17], knight=record[18], hunter=record[19], noble=record[20]))
 
     connection.close()
 
@@ -651,9 +646,8 @@ def main():
                         os.path.join(default_path, characters_directory, card.creature_path),
                         sparks_template_path,
                         os.path.join(default_path, "Templates"),
-                        str(card.attack),
+                        str(card.power),
                         str(card.mana),
-                        str(card.health),
                         str(card.cost),
                         str(card.ability_text),
                         str(card.name),
