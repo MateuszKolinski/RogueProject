@@ -373,6 +373,28 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     creature_image = cv.imread(creature_image_path, cv.IMREAD_UNCHANGED)
     creature_image = cv.resize(creature_image, (CREATURE_IMAGE_WIDTH, CREATURE_IMAGE_HEIGHT), interpolation = cv.INTER_AREA)
 
+    mask = np.all(card_image[:, :, :3] != 255, axis=-1)
+    sparks_image[mask] = [0, 0, 0, 0]
+
+    sparks_image_inner = sparks_image.copy()
+    sparks_image_outer = sparks_image.copy()
+
+    # Extract and threshold the alpha channel to create a binary mask, find its largest contour and create a mask from that
+    # It separates sparks_image on the borders from its inner counterpart, because they will have different opacity
+    alpha_channel = border_template[:, :, 3]
+
+    _, binary = cv.threshold(alpha_channel, 1, 255, cv.THRESH_BINARY)
+    contours, _ = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+    largest_contour = max(contours, key=cv.contourArea)
+    border_template_mask = np.zeros_like(alpha_channel)
+    cv.drawContours(border_template_mask, [largest_contour], -1, 255, thickness=cv.FILLED)
+
+    reverse_border_template_mask = cv.bitwise_not(border_template_mask)
+
+    sparks_image_inner = cv.bitwise_and(sparks_image_inner, sparks_image_inner, mask=border_template_mask)
+    sparks_image_outer = cv.bitwise_and(sparks_image_outer, sparks_image_outer, mask=reverse_border_template_mask)
+
     # Adding alpha channel if it's not present yet
     if creature_image.shape[2] != 4:
         # First create the image with alpha channel
@@ -485,8 +507,8 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
                 # Create right-bottom gradient
                 card_colour_image = create_angled_gradients(card_colour_image, card_image, -1, CARD_WIDTH//2, CARD_WIDTH-1)
 
-
-    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image.copy(), 0.2, 0.0)
+    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_inner.copy(), 0.025, 0.0)
+    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_outer.copy(), 0.15, 0.0)
 
     power_number_image = create_text_image(power, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
     power_number_image = image_outline(power_number_image)
