@@ -507,7 +507,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
                 # Create right-bottom gradient
                 card_colour_image = create_angled_gradients(card_colour_image, card_image, -1, CARD_WIDTH//2, CARD_WIDTH-1)
 
-    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_inner.copy(), 0.025, 0.0)
+    card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_inner.copy(), 0.03, 0.0)
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_outer.copy(), 0.15, 0.0)
 
     power_number_image = create_text_image(power, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
