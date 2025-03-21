@@ -395,6 +395,9 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
     sparks_image_inner = cv.bitwise_and(sparks_image_inner, sparks_image_inner, mask=border_template_mask)
     sparks_image_outer = cv.bitwise_and(sparks_image_outer, sparks_image_outer, mask=reverse_border_template_mask)
 
+    cv.imwrite(os.path.join(output_path, "sparks_image_inner.png"), sparks_image_inner)
+    cv.imwrite(os.path.join(output_path, "sparks_image_outer.png"), sparks_image_outer)
+
     # Adding alpha channel if it's not present yet
     if creature_image.shape[2] != 4:
         # First create the image with alpha channel
@@ -411,6 +414,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
         # Change color of any non-black pixel to a color associated with card's allegience
         colour_image[np.any(card_image.copy()[:, :, :3] != [0, 0, 0], axis=2)] = (COLOUR_DICT[allegiences[0]][0], COLOUR_DICT[allegiences[0]][1], COLOUR_DICT[allegiences[0]][2], 255)
         card_colour_image = colour_image
+        cv.imwrite(os.path.join(output_path, "card_colour_image.png"), card_colour_image)
     else:
         # Two allegiences which means two color card
         if len(allegiences) == 2:
@@ -433,6 +437,7 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
             card_colour_image[:, 2*CARD_WIDTH//6:CARD_WIDTH*4//6, :] = gradient_image.copy()[:, :, :]
 
             card_colour_image[card_image.copy()[:, :, 3] == 0] = [0, 0, 0, 0]
+            cv.imwrite(os.path.join(output_path, "card_colour_image.png"), card_colour_image)
         else:
             if len(allegiences) == 3:
                 mask_triangle = np.zeros((CARD_HEIGHT, CARD_WIDTH, 4), dtype=np.uint8)
@@ -506,9 +511,12 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
                 # Create right-bottom gradient
                 card_colour_image = create_angled_gradients(card_colour_image, card_image, -1, CARD_WIDTH//2, CARD_WIDTH-1)
+                cv.imwrite(os.path.join(output_path, "card_colour_image.png"), card_colour_image)
 
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_inner.copy(), 0.03, 0.0)
     card_colour_image = cv.addWeighted(card_colour_image.copy(), 1, sparks_image_outer.copy(), 0.15, 0.0)
+
+    cv.imwrite(os.path.join(output_path, "card_colour_image_with_web.png"), card_colour_image)
 
     power_number_image = create_text_image(power, os.path.join(logos_path, NUMBER_FONT), POWER_NUMBER_SIZE, POWER_NUMBER_COLOR)
     power_number_image = image_outline(power_number_image)
@@ -545,8 +553,12 @@ def create_card(card_template_path, border_template_path, creature_image_path, s
 
     creature_n_border = add_two_images(creature_image, image, (0, 0))
 
+    cv.imwrite(os.path.join(output_path, "creature_n_border.png"), creature_n_border)
+
     creature_n_border_n_colour = add_two_images(card_colour_image.copy(), creature_n_border, (0, 0))
     creature_n_border_n_colour[:, :, 3] = 255
+
+    cv.imwrite(os.path.join(output_path, "creature_n_border_n_colour.png"), creature_n_border_n_colour)
 
     image3 = add_two_images(creature_n_border_n_colour, power_number_image, (POWER_NUMBER_WIDTH_START - power_number_image.shape[1]//2, POWER_NUMBER_HEIGHT_START))
     image4 = add_two_images(image3, mana_number_image, (MANA_NUMBER_WIDTH_START - mana_number_image.shape[1], MANA_NUMBER_HEIGHT_START))
