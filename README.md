@@ -53,4 +53,4 @@ Finally, any text describing character's name and stats is added on top of the c
 
 Lastly, allegience logos are added at the bottom of the card. Each logo is colored according to its color scheme.
 
-<img width="200" height="280" alt="Final Logos" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/final_logos.png>
+<img width="200" height="280" alt="Final Logos" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/final.png>
