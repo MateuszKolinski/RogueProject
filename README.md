@@ -17,9 +17,9 @@ To generate a card, we need:
 
 First step of card generation is to divide fractal image into border fractal and inner fractal images. They will have different opacity going forward.
 
-<img width="200" height="280" alt="Fractal outer" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_outer.png"
+<img width="200" height="280" alt="Fractal outer" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_outer.png">
 
-<img width="200" height="280" alt="Fractal inner" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_inner.png"
+<img width="200" height="280" alt="Fractal inner" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_inner.png">
 
 Then we determine the colors of the card. Any card can currently have one, two or three colors. 
 
