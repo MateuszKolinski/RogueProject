@@ -15,7 +15,13 @@ To generate a card, we need:
 |:-----------------------:|:-------------------------:|:-------------------------:|
 | <img width="200" height="280" alt="White Template" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/WhiteTemplate.png"> White Card Template |  <img width="200" height="280" alt="Sparks image" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/Templates/Web.png"> Border Fractals | <img width="200" height="280" alt="Border Template" src="https://github.com/MateuszKolinski/RogueProject/blob/main/Templates/InnerBorderTemplate.png?raw=true"> Border Template |
 
-First step after loading the above images is to determine the colors of the card. Any card can currently have one, two or three colors. 
+First step of card generation is to divide fractal image into border fractal and inner fractal images. They will have different opacity going forward.
+
+<img width="200" height="280" alt="Fractal outer" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_outer.png"
+
+<img width="200" height="280" alt="Fractal inner" src="https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparks_image_inner.png"
+
+Then we determine the colors of the card. Any card can currently have one, two or three colors. 
 
 # One color card
 
@@ -35,9 +41,9 @@ To generate a card with three colors, the card space is divided into two trapeze
 
 <img width="200" height="280" alt="3color" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/3color.png>
 
-After generating a colored card template, a fanciful fractal image is weight-blended onto it.
+After generating a colored card template, two previously discussed fractal images are weight-blended onto it.
 
-<img width="200" height="280" alt="sparky" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/sparky.png>
+<img width="200" height="280" alt="sparky" src=https://raw.githubusercontent.com/MateuszKolinski/RogueProject/refs/heads/main/assets/card_colour_image_with_web.png>
 
 Next step is to add card borders from the Border Template onto character image.
 
